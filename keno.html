@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Forge Keno Tickets</title>
+  <style>
+    :root {
+      --bg: #050303;
+      --panel: #120909;
+      --panel-2: #1a0d0a;
+      --text: #fff1df;
+      --muted: #c9a78c;
+
+      --accent: #ff2a00;
+      --gold: #ffb000;
+
+      --picked: #b31212;
+      --drawn: #ff5a00;
+      --match: #ffd447;
+
+      --ember: #ff3000;
+      --deep-red: #5a0707;
+      --steel: #1a1717;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 50% -10%, rgba(255, 90, 0, 0.30), transparent 30rem),
+        radial-gradient(circle at 20% 15%, rgba(255, 42, 0, 0.18), transparent 22rem),
+        radial-gradient(circle at 80% 12%, rgba(255, 176, 0, 0.13), transparent 20rem),
+        linear-gradient(135deg, #030202, #120706 52%, #050303);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .wrap { width: min(1080px, 100%); }
+
+    .card {
+      background: rgba(18, 9, 9, 0.95);
+      border: 1px solid rgba(255, 90, 0, 0.24);
+      border-radius: 22px;
+      box-shadow:
+        0 24px 90px rgba(0, 0, 0, 0.62),
+        0 0 34px rgba(255, 42, 0, 0.12);
+      overflow: hidden;
+    }
+
+    .hero {
+      padding: 28px;
+      background:
+        linear-gradient(135deg, rgba(255, 42, 0, 0.24), rgba(255, 176, 0, 0.10)),
+        radial-gradient(circle at top, rgba(255, 90, 0, 0.18), transparent 22rem),
+        rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 90, 0, 0.20);
+      position: relative;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      width: min(220px, 70vw);
+      max-height: 120px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 18px rgba(255, 72, 0, 0.42));
+    }
+
+    .title-block {
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-shadow: 0 0 14px rgba(255, 176, 0, 0.35);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 5vw, 62px);
+      line-height: 0.95;
+      text-shadow:
+        0 0 18px rgba(255, 42, 0, 0.38),
+        0 2px 0 rgba(0, 0, 0, 0.75);
+    }
+
+    .subtitle {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      padding: 18px 28px;
+      background: rgba(0, 0, 0, 0.24);
+      border-bottom: 1px solid rgba(255, 90, 0, 0.15);
+    }
+
+    .meta-box, .ticket {
+      background:
+        linear-gradient(180deg, rgba(255, 90, 0, 0.07), rgba(255, 255, 255, 0.03)),
+        rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 90, 0, 0.18);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+      margin-bottom: 6px;
+    }
+
+    .value {
+      font-size: 18px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .content { padding: 28px; }
+
+    .tickets {
+      display: grid;
+      gap: 22px;
+    }
+
+    .ticket-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .ticket-name {
+      font-size: 24px;
+      font-weight: 900;
+      text-shadow: 0 0 14px rgba(255, 42, 0, 0.30);
+    }
+
+    .ticket-result {
+      color: var(--gold);
+      font-weight: 900;
+      font-size: 18px;
+      text-shadow: 0 0 12px rgba(255, 176, 0, 0.34);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .num {
+      height: 62px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)),
+        #151010;
+      border: 1px solid rgba(255, 90, 0, 0.14);
+      color: rgba(255, 241, 223, 0.88);
+      font-size: 22px;
+      font-weight: 800;
+      opacity: 0;
+      transform: translateY(12px) scale(0.94);
+      animation: popIn 420ms ease forwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .num::after {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+      transform: translateX(-120%) rotate(25deg);
+    }
+
+    .num.picked {
+      background:
+        radial-gradient(circle at top, rgba(255, 176, 0, 0.18), transparent 38px),
+        linear-gradient(180deg, rgba(179, 18, 18, 0.95), rgba(90, 7, 7, 0.86));
+      border-color: rgba(255, 42, 0, 0.92);
+      color: #fff1df;
+      box-shadow:
+        0 0 22px rgba(255, 42, 0, 0.44),
+        inset 0 0 14px rgba(255, 176, 0, 0.12);
+    }
+
+    .num.drawn {
+      border-color: rgba(255, 90, 0, 0.98);
+      box-shadow:
+        0 0 20px rgba(255, 90, 0, 0.48),
+        inset 0 0 12px rgba(255, 90, 0, 0.18);
+    }
+
+    .num.match {
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.40), transparent 38px),
+        linear-gradient(180deg, #ffd447, #ff7a00);
+      border-color: #ffd447;
+      color: #1a0800;
+      box-shadow:
+        0 0 34px rgba(255, 120, 0, 0.85),
+        0 0 16px rgba(255, 212, 71, 0.72);
+      animation: popIn 420ms ease forwards, jackpotPulse 1.1s ease-in-out infinite;
+    }
+
+    .num.revealing::after { animation: shine 700ms ease; }
+
+    @keyframes popIn {
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes jackpotPulse {
+      50% {
+        transform: scale(1.06);
+        box-shadow:
+          0 0 46px rgba(255, 120, 0, 0.95),
+          0 0 22px rgba(255, 212, 71, 0.86);
+      }
+    }
+
+    @keyframes shine {
+      to { transform: translateX(120%) rotate(25deg); }
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, #ff2a00, #8b0000);
+      color: #fff1df;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(255, 42, 0, 0.28);
+    }
+
+    button.secondary {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255, 90, 0, 0.20);
+      box-shadow: none;
+    }
+
+    .draw-panel {
+      margin-bottom: 20px;
+      padding: 18px;
+      background:
+        linear-gradient(180deg, rgba(255, 90, 0, 0.07), rgba(255,255,255,0.03));
+      border: 1px solid rgba(255, 90, 0, 0.16);
+      border-radius: 18px;
+    }
+
+    .draw-title { font-weight: 800; margin-bottom: 8px; }
+    .draw-numbers { color: var(--muted); line-height: 1.6; }
+
+    .fineprint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 18px;
+      border-top: 1px solid rgba(255, 90, 0, 0.14);
+      padding-top: 16px;
+    }
+
+    @media (max-width: 720px) {
+      .meta { grid-template-columns: 1fr; }
+      .brand-row { align-items: flex-start; }
+      .logo { width: min(180px, 80vw); }
+      .board { gap: 8px; }
+      .num { height: 50px; font-size: 18px; border-radius: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <div class="hero">
+        <div class="brand-row">
+          <img class="logo" src="forge-logo.png" alt="The Forge logo" onerror="this.style.display='none'" />
+          <div class="title-block">
+            <div class="eyebrow">The Forge</div>
+            <h1>The Forge Keno</h1>
+            <div class="subtitle">Your numbers have entered the flame. Watch the board ignite and see what the forge reveals.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="meta">
+        <div class="meta-box">
+          <div class="label">Player</div>
+          <div class="value" id="playerName">Lucky Guest</div>
+        </div>
+        <div class="meta-box">
+          <div class="label">Tickets</div>
+          <div class="value" id="ticketCount">1</div>
+        </div>
+        <div class="meta-box">
+          <div class="label">Draw</div>
+          <div class="value" id="drawStatus">Pending</div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="controls">
+          <button onclick="replay()">Replay Animation</button>
+          <button class="secondary" onclick="revealDraw()">Reveal Draw Results</button>
+        </div>
+
+        <div class="draw-panel">
+          <div class="draw-title">Draw Results</div>
+          <div class="draw-numbers" id="drawText">No draw revealed yet.</div>
+        </div>
+
+        <div class="tickets" id="tickets"></div>
+
+        <div class="fineprint">
+          Visual ticket display only. Official tickets, draw results, and payouts are tracked by The Forge Keno host plugin.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+
+    let player = params.get("player") || params.get("p") || "Lucky Guest";
+    let drawn = parseNumbers(params.get("draw") || params.get("d") || "");
+    let tickets = parseTickets();
+
+    function parseNumbers(raw) {
+      if (!raw) return [];
+      return raw
+        .split(/[,\s.;/\\-]+/)
+        .map(x => parseInt(x, 10))
+        .filter(n => Number.isInteger(n) && n >= 1 && n <= 30)
+        .filter((n, i, arr) => arr.indexOf(n) === i);
+    }
+
+    function parseTickets() {
+      const bundled = params.get("tickets");
+
+      if (bundled) {
+        return bundled.split("|").map((chunk, index) => {
+          const parts = chunk.split(":");
+          const id = parts.length > 1 ? parts[0] : String(index + 1);
+          const nums = parts.length > 1 ? parts.slice(1).join(":") : parts[0];
+          return { id, picks: parseNumbers(nums).slice(0, 5) };
+        }).filter(t => t.picks.length > 0);
+      }
+
+      const singleTicket = params.get("ticket") || params.get("t") || "001";
+      const singleNumbers = parseNumbers(params.get("numbers") || params.get("n") || "3,7,14,22,29").slice(0, 5);
+      return [{ id: singleTicket, picks: singleNumbers }];
+    }
+
+    function updateMeta() {
+      document.getElementById("playerName").textContent = player;
+      document.getElementById("ticketCount").textContent = tickets.length.toString();
+      document.getElementById("drawStatus").textContent = drawn.length ? "Ready" : "Pending";
+      document.getElementById("drawText").textContent = drawn.length
+        ? "Drawn numbers ready: " + drawn.join(", ")
+        : "No draw revealed yet.";
+    }
+
+    function payoutText(matchCount) {
+      if (matchCount >= 5) return "Jackpot";
+      if (matchCount === 4) return "150,000 gil";
+      if (matchCount === 3) return "25,000 gil";
+      return "No payout";
+    }
+
+    function renderTickets(showDraw = false) {
+      const holder = document.getElementById("tickets");
+      holder.innerHTML = "";
+
+      tickets.forEach((ticket, ticketIndex) => {
+        const section = document.createElement("section");
+        section.className = "ticket";
+
+        const matches = ticket.picks.filter(n => drawn.includes(n)).sort((a, b) => a - b);
+        const resultText = showDraw && drawn.length
+          ? `${matches.length} match${matches.length === 1 ? "" : "es"} — ${payoutText(matches.length)}`
+          : `Picks: ${ticket.picks.join(", ")}`;
+
+        section.innerHTML = `
+          <div class="ticket-title">
+            <div class="ticket-name">Ticket #${escapeHtml(ticket.id)}</div>
+            <div class="ticket-result">${escapeHtml(resultText)}</div>
+          </div>
+          <div class="board"></div>
+        `;
+
+        const board = section.querySelector(".board");
+
+        for (let i = 1; i <= 30; i++) {
+          const cell = document.createElement("div");
+          cell.className = "num";
+          cell.textContent = String(i).padStart(2, "0");
+          cell.style.animationDelay = `${(ticketIndex * 140) + (i * 24)}ms`;
+
+          if (ticket.picks.includes(i)) {
+            cell.classList.add("picked");
+          }
+
+          if (showDraw && drawn.includes(i)) {
+            setTimeout(() => {
+              cell.classList.add("drawn", "revealing");
+
+              if (ticket.picks.includes(i)) {
+                cell.classList.add("match");
+              }
+            }, drawn.indexOf(i) * 220 + ticketIndex * 160);
+          }
+
+          board.appendChild(cell);
+        }
+
+        holder.appendChild(section);
+      });
+    }
+
+    function replay() {
+      renderTickets(false);
+      document.getElementById("drawText").textContent = drawn.length
+        ? "Drawn numbers ready: " + drawn.join(", ")
+        : "No draw revealed yet.";
+    }
+
+    function revealDraw() {
+      if (!drawn.length) {
+        document.getElementById("drawText").textContent = "No draw numbers included in this link yet.";
+        return;
+      }
+
+      document.getElementById("drawText").textContent = "Drawn numbers: " + drawn.join(", ");
+      renderTickets(true);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    updateMeta();
+    renderTickets(false);
+
+    if (drawn.length) {
+      setTimeout(revealDraw, 850);
+    }
+  </script>
+</body>
+</html>
